@@ -1,5 +1,11 @@
 const LOGIN_TOKEN = '';
+const LOG_CHANNEL = 'melon';
 
+const MESSAGE_DELETED_EVENT_ID = '#0';
+const MESSAGE_DELETED_MESSAGE = "**Meddelande bortsopat från {channel} **";
+const MESSAGE_DELETED_COLOR = 'FF470F';
+
+require('format-unicorn') // this adds formatUnicorn to String.prototype
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
@@ -32,6 +38,37 @@ client.on('message', message => {
         })
         .catch(console.error);
     }
+  }
+});
+
+client.on('messageDelete', message => {
+  // Post a log in LOG_CHANNEL upon message deletion
+
+  const channel = message.guild.channels
+    .find(channel => channel.type === 'text' && channel.name === LOG_CHANNEL);
+
+  if (message.author === client.user && message.embeds.length > 0) {
+    // Repost message deletion log if it was deleted
+    const embed = message.embeds[0];
+
+    if (embed.footer.text === MESSAGE_DELETED_EVENT_ID) {
+      channel.send(new Discord.RichEmbed({
+        author: { name: embed.author.name },
+        color: embed.color,
+        description: embed.description,
+        thumbnail: { url: embed.thumbnail.url },
+        footer: { text: embed.footer.text }
+      }));
+    }
+  } else {
+    channel.send(new Discord.RichEmbed({
+      author: { name: message.author.tag },
+      color: Number('0x' + MESSAGE_DELETED_COLOR),
+      description: MESSAGE_DELETED_MESSAGE.formatUnicorn({ channel: message.channel })
+        + (message.content !== '' ? '\n' + message.content : ''),
+      thumbnail: { url: message.author.avatarURL },
+      footer: { text: MESSAGE_DELETED_EVENT_ID }
+    }));
   }
 });
 
