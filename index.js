@@ -51,7 +51,8 @@ client.on('message', message => {
 });
 
 client.on('messageUpdate', (oldmsg, newmsg) => {
-  if (oldmsg.author === client.user) {
+  // Only send a content update if the actual content has changed
+  if (oldmsg.content === client.content) {
     return;
   }
 
