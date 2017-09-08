@@ -13,6 +13,8 @@ require('format-unicorn') // this adds formatUnicorn to String.prototype
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
+const messagesDeletedByUs = new Set();
+
 client.on('ready', () => {
   console.log('Melon is ready!');
 });
@@ -26,6 +28,8 @@ client.on('message', message => {
         .then(member => {
           // Only allow access to users with the Administrator permission
           if (member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
+            messagesDeletedByUs.add(message);
+
             // Delete the request message to get rid of spam
             message
               .delete()
@@ -65,6 +69,10 @@ client.on('messageUpdate', (oldmsg, newmsg) => {
 });
 
 client.on('messageDelete', message => {
+  if (messagesDeletedByUs.has(message)) {
+    return;
+  }
+
   // Post a log in LOG_CHANNEL upon message deletion
   const channel = message.guild.channels
     .find(channel => channel.type === 'text' && channel.name === LOG_CHANNEL);
