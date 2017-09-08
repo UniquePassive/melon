@@ -23,7 +23,8 @@ client.on('message', message => {
           // Only allow access to users with the Administrator permission
           if (member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
             // Delete the request message to get rid of spam
-            message.delete()
+            message
+              .delete()
               .then(msg => {
                 // Destroy the Discord session
                 client
@@ -43,7 +44,6 @@ client.on('message', message => {
 
 client.on('messageDelete', message => {
   // Post a log in LOG_CHANNEL upon message deletion
-
   const channel = message.guild.channels
     .find(channel => channel.type === 'text' && channel.name === LOG_CHANNEL);
 
