@@ -52,7 +52,7 @@ client.on('message', message => {
 
 client.on('messageUpdate', (oldmsg, newmsg) => {
   // Only send a content update if the actual content has changed
-  if (oldmsg.content === client.content) {
+  if (oldmsg.content === newmsg.content) {
     return;
   }
 
