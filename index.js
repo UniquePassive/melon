@@ -3,11 +3,11 @@ const LOG_CHANNEL = 'melon';
 
 const MESSAGE_DELETED_EVENT_ID = '#0';
 const MESSAGE_DELETED_MESSAGE = "**Meddelande bortsopat från {channel}**";
-const MESSAGE_DELETED_COLOR = 'FF470F';
+const MESSAGE_DELETED_COLOR = 'FF6464';
 
 const MESSAGE_UPDATED_EVENT_ID = '#1';
 const MESSAGE_UPDATED_MESSAGE = "**Meddelande i {channel} redigerat**\n\"{oldmsg}\"\n**till**\n\"{newmsg}\"";
-const MESSAGE_UPDATED_COLOR = 'FF470F';
+const MESSAGE_UPDATED_COLOR = 'FEEFB3';
 
 require('format-unicorn') // this adds formatUnicorn to String.prototype
 const Discord = require('discord.js');
