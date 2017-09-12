@@ -85,22 +85,45 @@ client.on('messageDelete', message => {
     if (embed.footer.text === MESSAGE_DELETED_EVENT_ID 
         || embed.footer.text === MESSAGE_UPDATED_EVENT_ID) {
       channel.send(new Discord.RichEmbed({
-        author: { name: embed.author.name },
+        author: { icon_url: embed.author.icon, name: embed.author.name },
         color: embed.color,
         description: embed.description,
-        thumbnail: { url: embed.thumbnail.url },
         footer: { text: embed.footer.text }
       }));
     }
   } else {
-    channel.send(new Discord.RichEmbed({
-      author: { name: message.author.tag },
-      color: Number('0x' + MESSAGE_DELETED_COLOR),
-      description: MESSAGE_DELETED_MESSAGE.formatUnicorn({ channel: message.channel })
-        + (message.content !== '' ? '\n' + message.content : ''),
-      thumbnail: { url: message.author.avatarURL },
-      footer: { text: MESSAGE_DELETED_EVENT_ID }
-    }));
+    var content = message.content;
+
+    // Add attachment links to content
+    Array.from(message.attachments.values())
+      .forEach(attachment => {
+        if (content.length !== 0) {
+          content += '\n';
+        }
+        content += attachment.url;
+      });
+
+    if (message.guild.available) {
+      message.guild
+        .fetchMember(message.author)
+        .then(member => {
+          channel.send(new Discord.RichEmbed({
+            author: { icon_url: message.author.avatarURL, name: member.displayName },
+            color: Number('0x' + MESSAGE_DELETED_COLOR),
+            description: MESSAGE_DELETED_MESSAGE.formatUnicorn({ channel: message.channel })
+              + (content !== '' ? '\n' + content : ''),
+            footer: { text: MESSAGE_DELETED_EVENT_ID }
+          }));
+        });
+    } else {
+      channel.send(new Discord.RichEmbed({
+        author: { icon_url: message.author.avatarURL, name: message.author.username },
+        color: Number('0x' + MESSAGE_DELETED_COLOR),
+        description: MESSAGE_DELETED_MESSAGE.formatUnicorn({ channel: message.channel })
+          + (content !== '' ? '\n' + content : ''),
+        footer: { text: MESSAGE_DELETED_EVENT_ID }
+      }));
+    }
   }
 });
 
