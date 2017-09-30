@@ -29,8 +29,6 @@ client.setProvider(
     sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new Commando.SQLiteProvider(db))
 ).catch(console.error);
 
-const messagesDeletedByUs = new Set();
-
 client.on('ready', () => {
   console.log('Melon is ready!');
 
@@ -67,10 +65,6 @@ client.on('messageUpdate', (oldmsg, newmsg) => {
 });
 
 client.on('messageDelete', message => {
-  if (messagesDeletedByUs.has(message)) {
-    return;
-  }
-
   // Post a log in LOG_CHANNEL upon message deletion
   const channel = message.guild.channels
     .find(channel => channel.type === 'text' && channel.name === LOG_CHANNEL);
