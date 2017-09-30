@@ -1,4 +1,11 @@
-const LOGIN_TOKEN = '';
+require('format-unicorn') // this adds formatUnicorn to String.prototype
+const Commando = require('discord.js-commando');
+const Discord = require('discord.js');
+const path = require('path');
+const sqlite = require('sqlite');
+const fs = require('fs');
+
+const LOGIN_TOKEN = 'bot_token';
 const LOG_CHANNEL = 'melon';
 
 const MESSAGE_DELETED_EVENT_ID = '#0';
@@ -9,50 +16,40 @@ const MESSAGE_UPDATED_EVENT_ID = '#1';
 const MESSAGE_UPDATED_MESSAGE = "**Meddelande i {channel} redigerat**\n\"{oldmsg}\"\n**till**\n\"{newmsg}\"";
 const MESSAGE_UPDATED_COLOR = 'FEEFB3';
 
-require('format-unicorn') // this adds formatUnicorn to String.prototype
-const Discord = require('discord.js');
-const client = new Discord.Client();
+const client = new Commando.Client({
+    owner: 'user_id',
+    commandPrefix: '!'
+});
+
+client.registry
+    .registerDefaults()
+    .registerCommandsIn(path.join(__dirname, 'commands'));
+
+client.setProvider(
+    sqlite.open(path.join(__dirname, 'settings.sqlite3')).then(db => new Commando.SQLiteProvider(db))
+).catch(console.error);
 
 const messagesDeletedByUs = new Set();
 
 client.on('ready', () => {
   console.log('Melon is ready!');
-});
 
-client.on('message', message => {
-  // Terminate the bot if !stop is sent
-  if (message.content === '!stop') {
-    if (message.guild.available) {
-      message.guild
-        .fetchMember(message.author)
-        .then(member => {
-          // Only allow access to users with the Administrator permission
-          if (member.hasPermission(Discord.Permissions.FLAGS.ADMINISTRATOR)) {
-            messagesDeletedByUs.add(message);
-
-            // Delete the request message to get rid of spam
-            message
-              .delete()
-              .then(msg => {
-                // Destroy the Discord session
-                client
-                  .destroy()
-                  .then(() => {
-                    // After disconnecting, wait for 5s before forcing termination of the process
-                    setTimeout(process.exit(0), 5000);
-                  });
-              })
-              .catch(console.error);
-          }
-        })
-        .catch(console.error);
+  fs.readFile(path.join(__dirname, 'commands/util/playingGame.txt'), "utf-8", function read(err, data) {
+    if (err) {
+      throw err;
     }
-  }
+    client.user.setGame(data);
+  });
 });
 
 client.on('messageUpdate', (oldmsg, newmsg) => {
   // Only send a content update if the actual content has changed
   if (oldmsg.content === newmsg.content) {
+    return;
+  }
+
+  // Don't send a content update message if the author is the bot
+  if (message.author === client.user) {
     return;
   }
 
