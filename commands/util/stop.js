@@ -15,6 +15,8 @@ module.exports = class StopCommand extends commando.Command {
     }
 
     async run(message, args) {
+        message.delete();
+
         this.client
           .destroy()
           .then(() => {
