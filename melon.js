@@ -19,6 +19,7 @@ const MESSAGE_UPDATED_COLOR = 'FEEFB3';
 const client = new Commando.Client({
     owner: 'user_id',
     commandPrefix: '!'
+    unknownCommandResponse: false
 });
 
 client.registry
