@@ -48,7 +48,7 @@ client.on('messageUpdate', (oldmsg, newmsg) => {
   }
 
   // Don't send a content update message if the author is the bot
-  if (message.author === client.user) {
+  if (oldmsg.author === client.user) {
     return;
   }
 
