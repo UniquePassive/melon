@@ -17,9 +17,9 @@ module.exports = class KickVoiceCommand extends commando.Command {
         });
     }
 
-    hasPermission(msg) {
-        return this.client.isOwner(msg.author);
-    }
+    //hasPermission(msg) {
+    //    return this.client.isOwner(msg.author);
+    //}
 
     async run(message, args) {
         message.delete();
